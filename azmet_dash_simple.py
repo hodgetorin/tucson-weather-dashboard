@@ -116,6 +116,8 @@ app.layout = dbc.Container([
     html.Br(),       
     html.H4("Historic Tucson Weather Dashboard"),
     html.Br(),
+    html.H6("34 years of data scraped from https://cals.arizona.edu/azmet/"),
+    html.Br(),
     dbc.Row([
         dbc.Col([metric_dropdown],
                 width={'size':6}),
