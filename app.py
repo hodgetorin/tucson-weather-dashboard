@@ -4,18 +4,10 @@ Created on Thu Aug 18 09:28:47 2022
 
 @author: Torin
 """
-import sys, os
-#from datetime import date, timedelta, datetime
-
-import time
-
 import pandas as pd
-import numpy as np
 
-
+import pathlib
 import datetime as dt
-import matplotlib.pyplot as plt
-import seaborn as sns
 import plotly.express as px
 import plotly.graph_objects as go
 
@@ -23,16 +15,23 @@ from dash import Dash, dcc, html, Input, Output
 from plotly.subplots import make_subplots
 import dash_bootstrap_components as dbc
 
+import plotly.io as pio
+pio.templates
 
+
+
+## these 3 lines are used to tell heroku where the csv sheet is:
+PATH = pathlib.Path(__file__).parent
+DATA_PATH = PATH.joinpath("data").resolve()
+df = pd.read_csv(DATA_PATH.joinpath('https://github.com/hodgetorin/tucson-weather-dashboard/blob/main/df_historic_Tucson.csv'))
 
 
 ### DASH APP ### 
 app = Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
+server = app.server # needed for heroku deployment
 
 
-df = pd.read_csv('https://github.com/hodgetorin/tucson-weather-dashboard/blob/main/df_historic_Tucson.csv') 
-
-
+ 
 def preprocess(df):
      
      df['Rainfall - in'] = df['Rainfall'] / 2.54         
@@ -78,7 +77,7 @@ datepicker = dcc.DatePickerRange(
         initial_visible_month=dt.date(2021, 1, 1),  # the month initially presented when the user opens the calendar
         display_format='MMM Do',  # how selected dates are displayed in the DatePickerRange component.
         month_format='MMMM',  # how calendar headers are displayed when the calendar is opened.
-        minimum_nights=2,  # minimum number of days between start and end date
+        minimum_nights=5,  # minimum number of days between start and end date
     
         persistence=True,
         persisted_props=['start_date'],
@@ -111,7 +110,7 @@ app.layout = dbc.Container([
     html.Br(),       
     html.H4("Historic Tucson Weather Dashboard"),
     html.Br(),
-    html.H6("34 years of data scraped from https://cals.arizona.edu/azmet/"),
+    html.H6("34 years of data scraped from cals.arizona.edu/azmet/"),
     html.Br(),
     dbc.Row([
         dbc.Col([metric_dropdown],
@@ -133,6 +132,9 @@ app.layout = dbc.Container([
                  
         ])   
 ])
+
+
+
 
 @app.callback(
     
@@ -183,11 +185,11 @@ def main_graph(start_dt, end_dt, metric_chosen):
     md = dff[metric_chosen].median
     avg = dff[metric_chosen].mean        
      
-    fig1 = px.box(dff, x='Mo_Day', y=metric_chosen) 
+    fig1 = px.box(dff, x='Mo_Day', y=metric_chosen, template='seaborn') 
     fig1.update_xaxes(type='category')  
         #fig1.update_layout(margin=dff['Mo_Day'])
         
-    fig2 = px.histogram(dff, x=metric_chosen, orientation='v')
+    fig2 = px.histogram(dff, x=metric_chosen, orientation='v', template='seaborn')
     
         
           # xaxis_rangeslider_visible=False,
@@ -196,7 +198,7 @@ def main_graph(start_dt, end_dt, metric_chosen):
       
 
 if __name__ == "__main__":
-    app.run_server(debug=False, port=8056)
+    app.run_server(debug=False)
 
 
 
