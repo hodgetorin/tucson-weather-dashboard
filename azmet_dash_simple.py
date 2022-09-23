@@ -29,15 +29,10 @@ import dash_bootstrap_components as dbc
 ### DASH APP ### 
 app = Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
 
-# User Defined:
-Location = "Tucson"
+
+df = pd.read_csv('https://github.com/hodgetorin/tucson-weather-dashboard/blob/main/df_historic_Tucson.csv') 
 
 
-# data frame processing
-def load_df(Location):
-     df = pd.read_csv("df_historic_"+Location+".csv") # to simplify changing locations' DF..?
-     return df
- 
 def preprocess(df):
      
      df['Rainfall - in'] = df['Rainfall'] / 2.54         
